@@ -18,20 +18,56 @@ def turn(speed, seconds):
 def turnDegrees(degrees):
     markers = R.see()
     lowestDifferenceYet = 1000 #Arbitrary
-    for marker in markers:
-        if marker.info.marker_type == MARKER_ARENA:
-            difference = abs(degrees - marker.rot_y)
-            if difference < lowestDifferenceYet:
-                lowestDifferenceYet = difference
-                bestMarker = marker
 
-    initialRotation = bestMarker.rot_y
-    turn(100, (degrees/50)) #NEEDS CALIBRATION
-    R.see()
     if degrees >= 0:
-        initialRotation - bestMarker.rot_y
+        for marker in markers:
+            if marker.info.marker_type == MARKER_ARENA:
+                difference = abs(degrees - marker.rot_y)
+                if difference < lowestDifferenceYet:
+                    lowestDifferenceYet = difference #Pull out the best marker for turning
+                    bestMarkerOffset = marker.offset
 
-    return False
+        initialRotation = bestMarker.rot_y
+        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        turn(100, (degrees/50)) #NEEDS CALIBRATION
+
+    if degrees < 0:
+        for marker in markers:
+            if marker.info.marker_type == MARKER_ARENA:
+                difference = abs(degrees + marker.rot_y)
+                if difference < lowestDifferenceYet:
+                    lowestDifferenceYet = difference #Pull out the best marker for turning
+                    bestMarkerOffset = marker.offset
+
+        initialRotation = bestMarker.rot_y
+        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        turn(-100, (degrees/50)) #NEEDS CALIBRATION
+
+    markers = R.see()#Scan to make finer adjustment
+    for marker in markers:
+        if marker.info.marker_type == MARKER_ARENA and marker.offset == bestMarkerOffset:
+            bestMarker = marker
+
+    if degrees >= 0:
+        newDifference = initialRotation - bestMarker.rot_y #How far we are off the specified degrees
+        if newDifference > 10: #We didn't turn far enough
+            #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            turn(100, (degrees/50)) #NEEDS CALIBRATION
+
+        elif newDifference < -10: #We turned too far
+            #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            turn(-100, (degrees/50)) #NEEDS CALIBRATION
+
+    if degrees < 0: #Polarity needs fixing here
+        newDifference = initialRotation + bestMarker.rot_y #How far we are off the specified degrees
+        if (degrees + newDifference) > 10: #We turned too far
+            #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            turn(100, (degrees/50)) #NEEDS CALIBRATION
+
+        elif (degrees + newDifference) < -10: #We didn't turn far enough
+            #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            turn(-100, (degrees/50)) #NEEDS CALIBRATION
+
 
 def drive(speed, seconds):
     startTime = time.time()
@@ -51,15 +87,18 @@ def drive(speed, seconds):
                     #Avoid robot
                     if distanceToSide <= 0: #If marker is to the Left
                         print "marker is to the Left"
+                        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                         turn(100, 0.25)#NEEDS CALIBRATION
 
                         distanceToSide = -distanceToSide #Convert negative value to positive value
 
+                        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                         timeToMove = (30 - distanceToSide)#NEEDS CALIBRATION
                         R.motors[0].m0.power = 100
                         R.motors[0].m1.power = 100
                         time.sleep(0.3) #timeToMove)
 
+                        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                         #NEEDS CALIBRATION
                         turn(-100, 0.25) #Turn back to the orignal direction
 
@@ -67,11 +106,13 @@ def drive(speed, seconds):
                         print "marker is to the Right"
                         turn(-100, 0.25)#NEEDS CALIBRATION
 
+                        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                         timeToMove = (30 - distanceToSide)#NEEDS CALIBRATION
                         R.motors[0].m0.power = 100
                         R.motors[0].m1.power = 100
                         time.sleep(0.3) #timeToMove)
 
+                        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                         #NEEDS CALIBRATION
                         turn(100, 0.25) #Turn back to the orignal direction
                 else:
