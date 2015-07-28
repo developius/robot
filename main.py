@@ -121,11 +121,31 @@ def drive(speed, seconds):
     R.motors[0].m0.power = 0 #Stop motors
     R.motors[0].m1.power = 0
 
+def tokenScan():
+    tokens = filter(token_filter, R.see())
+    """
+    lowestDistanceYet = 1000 #Arbitrary
+    if len(tokens) > 0:
+        orderedTokenList = {}
+        for token in tokens:
+            if token.dist < lowestDistanceYet:
+                    lowestDistanceYet.extend(token.dist) #Pull out the best marker for turning
+            orderedTokenList =
+            orderedTokenList[token.dist] = token
+
+        sorted(orderedTokenList, key=lambda token: (orderedTokenList[i]))
+        print "OrderedTokenList: ", orderedTokenList
+    else: #Can't find any tokens
+        return False
+    """
+    tokens_sorted = sorted(tokens, key = lambda token: token.dist)
+    print tokens_sorted
 
 state = SEARCHING
 
 while True:
     if state == SEARCHING:
+        tokenScan()
         print "Searching..."
         tokens = filter(token_filter, R.see())
         if len(tokens) > 0:
