@@ -43,11 +43,17 @@ def coords(m1,m2): #offset1,offset2,dist1,dist2,rot1,rot2):
     dist2 = m2.dist
     dist3 = sqrt((dx^2)+(dy^2))
     theta = radians(abs(m1.rot_y - m2.rot_y))
-    h = asin(dx * (sin(pi/2))/dist3)
+    if dx == 0:
+        h = 0
+    else:
+        h = asin(dx * (sin(pi/2))/dist3)
     i = asin(dist1 * (sin(theta))/dist3)
     j = pi - h - i
     Rx = sin(j) * (dist1)/(sin(pi/2))
-    k = asin(dy * (sin(pi/2))/dist3)
+    if dy == 0:
+        k = 0
+    else:
+        k = asin(dy * (sin(pi/2))/dist3)
     l = asin(dist2 * (sin(theta))/dist3)
     m = pi - k - l
     Ry = sin(m) * (dist2)/(sin(pi/2))
